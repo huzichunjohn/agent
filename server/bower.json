@@ -1,0 +1,22 @@
+{
+  "name": "server",
+  "authors": [
+    "johnhu <huzichunjohn@126.com>"
+  ],
+  "description": "just a test.",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "angular": "angularjs#^1.5.7",
+    "d3": "^4.0.0"
+  }
+}

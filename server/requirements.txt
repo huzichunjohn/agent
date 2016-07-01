@@ -1,0 +1,5 @@
+Django (1.8)
+pip (8.1.2)
+requests (2.10.0)
+setuptools (23.1.0)
+wheel (0.29.0)
