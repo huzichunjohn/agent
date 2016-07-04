@@ -24,16 +24,16 @@ def index(request):
 	return HttpResponse("pong")
 
 def status(request):
-    status = {}
+    status = []
     ip_list = conn.smembers("iplist") 
     for ip in ip_list:
 	last_updated = conn.get(ip)
         last_updated_timestamp = get_timestamp_by_string(last_updated, "%Y-%m-%d %H:%M:%S") 
         now = int(time.time())
         if now - last_updated_timestamp > 10:
-   	    status[ip] = "critical"      
+            status.append({"ip": ip, "status": "critical"})
 	elif now - last_updated_timestamp > 5:
-	    status[ip] = "warning"
+	    status.append({"ip": ip, "status": "warning"})
         else:
-	    status[ip] = "ok"
+	    status.append({"ip": ip, "status": "ok"})
     return HttpResponse(json.dumps(status), content_type="application/json")

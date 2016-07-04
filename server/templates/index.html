@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="demo">
 <head>
   <meta charset="utf-8">
   <title>status</title>
   <link href="/static/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
   <link href="/static/css/index.css" rel="stylesheet">
   <script type="text/javascript" src="/static/d3/d3.js"></script>
-  <script type="text/javascript" src="/static/angular/angular.js"></script>
 </head>
-<body>
+<body ng-controller="demoCtrl">
 
   <div class="container">
     <div class="row bs-callout bs-callout-danger">
@@ -17,7 +16,25 @@
     </div>
   </div>
 
+  <div class="container">
+    {% verbatim %}
+    <div class="row" ng-repeat="info in status">
+      <div ng-if='info.status == "critical"'>
+        <span class="badge" style="background-color:red">{{ info.ip }}</span>
+      </div>
+      <div ng-if='info.status == "ok"'>
+        <span class="badge" style="background-color:green">{{ info.ip }}</span>
+      </div>
+      <div ng-if='info.status == "warning"'>
+        <span class="badge" style="background-color:yellow">{{ info.ip }}</span>
+      </div>
+    </div>
+    {% endverbatim %}
+  </div>
+
   <script type="text/javascript" src="/static/jquery/dist/jquery.js"></script>
   <script type="text/javascript" src="/static/bootstrap/dist/js/bootstrap.js"></script>
+  <script type="text/javascript" src="/static/angular/angular.js"></script>
+  <script type="text/javascript" src="/static/js/app.js"></script>
 </body>
 </html>

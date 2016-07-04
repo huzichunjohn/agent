@@ -9,5 +9,6 @@ urlpatterns = [
 
     url(r'^$', views.index, name='index'),
     url(r'^ping/', include('ping.urls')),
+    url(r'^application/', include('app.urls')),
     url(r'^admin/', include(admin.site.urls)),
 ]

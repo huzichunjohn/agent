@@ -9,6 +9,7 @@ import time
 import socket
 import requests
 import threading
+import zmq
 
 from utils import get_hostname, get_ip_by_nic
 
@@ -51,15 +52,47 @@ class Heartbeat(threading.Thread):
 	    log.debug("the network connection abnormal.")
 	except requests.exceptions.Timeout as e:
 	    log.debug("the heartbeat server response timeout.")
+
+
+class Deployer(threading.Thread):
+    def __init__(self, name, port):
+        super(Deployer, self).__init__()
+	self.name = name
+	self.port = port	
+        self.stop = False
+	self.initialize_socket()
+
+    def initialize_socket(self):
+	context = zmq.Context()
+	self.socket = context.socket(zmq.REP)
+	self.socket.bind("tcp://*:%d" % (self.port))
+
+    def run(self):
+	while not self.stop:
+	    self.process_msg()
+
+    def shutdown(self):
+	self.stop = True	
+
+    def process_msg(self):
+	msg = self.socket.recv()
+	log.info("receive message: %s" % (msg))
+        time.sleep(2)
+        self.socket.send("ok")
 	
 if __name__ == "__main__":
     try:
         heartbeat = Heartbeat("http://172.16.16.199:8000/ping/", 5)
         heartbeat.setDaemon(True)
         heartbeat.start()
+
+	deployer = Deployer("deploy", 10000)
+	deployer.setDaemon(True)
+	deployer.start()
         
 	while True:
 	    time.sleep(5)
     except:
         raise
 	heartbeat.shutdown()
+        deployer.shutdown()
