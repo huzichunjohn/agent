@@ -37,3 +37,16 @@ def status(request):
         else:
 	    status.append({"ip": ip, "status": "ok"})
     return HttpResponse(json.dumps(status), content_type="application/json")
+
+def get_available_hosts():
+    ips = []
+    ip_list = conn.smembers("iplist")
+    for ip in ip_list:
+	last_updated = conn.get(ip)
+        last_updated_timestamp = get_timestamp_by_string(last_updated, "%Y-%m-%d %H:%M:%S")
+        now = int(time.time())
+        
+        if now - last_updated_timestamp <= 5:
+	    ips.append(ip)
+
+    return ips

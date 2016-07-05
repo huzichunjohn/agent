@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <title>Application</title>
   <link href="/static/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+  <script type="text/javascript" src="/static/jquery/dist/jquery.js"></script>
+  <script src="/static/js/application.js"></script>
 </head>
 <body>
   <div class="container">
@@ -19,7 +21,6 @@
 	</tr>
       </thead>
       <tbody>
-      <tr>
       {% for application in applications %}
       <tr>
         <td>{{ application.id }}</td>
@@ -29,7 +30,6 @@
         <td><button type="submit" class="btn btn-success">deploy</button></td>
       </tr>
       {% endfor %}
-      </tr>
       </tbody>
       </table>
     </div>

@@ -3,7 +3,7 @@ import zmq
 context = zmq.Context()
 
 socket = context.socket(zmq.REQ)
-socket.connect("tcp://localhost:10000")
+socket.connect("tcp://172.16.16.197:10000")
 
 for i in xrange(10):
     print "send message ", i, "..."
