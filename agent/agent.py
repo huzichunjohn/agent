@@ -9,6 +9,8 @@ import time
 import socket
 import requests
 import threading
+import Queue
+import os
 import zmq
 
 from utils import get_hostname, get_ip_by_nic
@@ -55,10 +57,11 @@ class Heartbeat(threading.Thread):
 
 
 class Deployer(threading.Thread):
-    def __init__(self, name, port):
+    def __init__(self, name, port, queue):
         super(Deployer, self).__init__()
 	self.name = name
-	self.port = port	
+	self.port = port
+	self.queue = queue	
         self.stop = False
 	self.initialize_socket()
 
@@ -77,18 +80,46 @@ class Deployer(threading.Thread):
     def process_msg(self):
 	msg = self.socket.recv()
 	log.info("receive message: %s" % (msg))
-        time.sleep(2)
+        self.queue.put(msg)
+        log.info("put %s to queue." % (msg))
         self.socket.send("ok")
+
+class Executor(threading.Thread):
+    def __init__(self, queue):
+	super(Executor, self).__init__()
+	self.queue = queue
+        self.stop = False
+
+    def run(self):
+	while not (self.stop and self.queue.empty()):
+	    info = self.queue.get()
+	    log.info("get task from queue: %s" % (info))
+	    self.process(info)
+	    self.queue.task_done()
+
+    def process(self, info):
+        info = json.loads(info)
+        self.path = info["path"]
+	if not os.path.exists(self.path):
+	    os.makedirs(self.path)
+	time.sleep(1)	
+	log.info("task is finished.")
 	
 if __name__ == "__main__":
+    queue = Queue.Queue()
+
     try:
         heartbeat = Heartbeat("http://172.16.16.199:8000/ping/", 5)
         heartbeat.setDaemon(True)
         heartbeat.start()
 
-	deployer = Deployer("deploy", 10000)
+	deployer = Deployer("deploy", 10000, queue)
 	deployer.setDaemon(True)
 	deployer.start()
+        
+	executor = Executor(queue)
+	executor.setDaemon(True)
+	executor.start()
         
 	while True:
 	    time.sleep(5)
@@ -96,3 +127,4 @@ if __name__ == "__main__":
         raise
 	heartbeat.shutdown()
         deployer.shutdown()
+	executor.shutdown()
